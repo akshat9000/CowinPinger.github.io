@@ -5,4 +5,4 @@ ___
 ## TODO:
 1. Implement push notifications using firebase server
 2. Implement logic for continuous process (probably using set interval to call the API)
-3. Make all the above logic work in background even when app is not being used
+3. Make all the above logic works in background even when app is not being used
