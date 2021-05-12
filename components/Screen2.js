@@ -6,6 +6,7 @@ import BasicContainer from "./BasicContainer"
 import Card from "./Card"
 import ListItem from "./ListItem"
 import { useNavigation } from '@react-navigation/native';
+import { addNewJob } from "../config/Functions"
 
 let data1 = require('../config/States')
 let states = data1.states
@@ -21,6 +22,10 @@ function Screen2(props) {
     const [chooseDist, setChooseDist] = useState("Select a District");
     const [distList, setDistList] = useState([])
     const [distId, setDistId] = useState("0")
+    const [ageModal, setAgeModal] = useState(false)
+    const [age, setAge] = useState("Select Age Bracket")
+
+    const ageBracket = [{age: "18-45"},{age: "45+"}]
 
     const navigation = useNavigation()
 
@@ -41,11 +46,19 @@ function Screen2(props) {
                         type="DISTRICT" 
                         setModal={setDistModal}
                         value={chooseDist}
+                    /> 
+                    <Card 
+                        type="AGE BRACKET" 
+                        setModal={setAgeModal}
+                        value={age}
                     />      
                     <TouchableHighlight
                         activeOpacity={0.8}
                         underlayColor="#005A9C"
-                        onPress={() => navigation.navigate('screen3')}
+                        onPress={() => {
+                            addNewJob(chooseDist,distId,age)
+                            navigation.navigate('screen3')
+                            }}
                         style={{
                             position: "absolute",
                             bottom: 20
@@ -79,10 +92,6 @@ function Screen2(props) {
             <Modal visible={distModal} animationType="slide">
                 <Button 
                     title="Select a District"
-                    onPress={() => {
-                        setDistModal(false)
-                        // console.log(distList)
-                        }}
                 />
                 <FlatList 
                     data={distList}
@@ -93,6 +102,22 @@ function Screen2(props) {
                             setChooseDist(item.name)
                             setDistId(item.district_id)
                             setDistModal(false)
+                        }}
+                    />}
+                />
+            </Modal>
+            <Modal visible={ageModal} animationType="slide">
+                <Button 
+                    title="Select your age bracket"
+                />
+                <FlatList 
+                    data={ageBracket}
+                    keyExtractor={item => item.age}
+                    renderItem={({item}) => <ListItem 
+                        name={item.age}
+                        onPress={() => {
+                            setAge(item.age)
+                            setAgeModal(false)
                         }}
                     />}
                 />
