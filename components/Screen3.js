@@ -37,7 +37,7 @@ function Screen3(props) {
                 <TouchableHighlight
                     underlayColor="#005A9C"
                     activeOpacity={0.8}
-                    onPress={() => navigation.navigate('screen1')}
+                    onPress={() => navigation.navigate('screen2')}
                     style={{position: "absolute", bottom: 30}}
                 >
                     <AntDesign name="plussquareo" size={40} color="dodgerblue" /> 

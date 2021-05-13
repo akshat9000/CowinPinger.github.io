@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Modal, FlatList, Button, TouchableHighlight } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import * as TaskManager from "expo-task-manager"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import BasicContainer from "./BasicContainer"
 import Card from "./Card"
@@ -15,6 +17,12 @@ let data2 = require('../config/Districts')
 let districts = data2.districts
 
 function Screen2(props) {
+
+    useEffect(() => {
+        TaskManager.unregisterAllTasksAsync()
+        AsyncStorage.clear()
+    },[])
+
     const [stateModal, setStateModal] = useState(false);
     const [distModal, setDistModal] = useState(false);
     const [chooseState, setChooseState] = useState("Select a State");
