@@ -114,23 +114,16 @@ const checkSlots = async (distId = "", todayDate = "", age = "") => {
     const fetchURL = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=395&date=13-05-2021"
     try {
         console.log(fetchURL)
-        const response = await fetch(fetchURL)
-        var data = response.json()
+        const data = await fetch(fetchURL).then(res => res.json());
         if(data["centers"]){
-            data["centers"].forEach(center => {
-                var pin = center["pincode"]
-                var name = center["name"]
-                center["session"].forEach(session => {
-                    if(session["min_age_limit"] <= age && session["available_capacity"] >= 1){
-                        //Create Push Notif
-                        const msg = "Available on " + today + "\nCenter name: " + name + "\nPin code: " + pin.toString() + "\n" + session["available_capacity"] + " slots available\n"
-                        console.log(msg)
-                        return true
-                    } else {
-                        return true
-                    }
-                })
-            });
+            return data.centers.map(center => {
+                return {
+                    ...center,
+                    sessions: center.sessions.filter(session => {
+                        return session.available_capacity>0 && session.min_age_limit<=age;
+                    })
+                } 
+            }).filter(center => center.sessions.length>0)
         }
     } catch (e) {
         console.log('Fetching failed, tried at: ',fetchURL)
