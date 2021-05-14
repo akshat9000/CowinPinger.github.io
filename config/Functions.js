@@ -3,6 +3,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as BackgroundFetch from "expo-background-fetch"
 import * as TaskManager from "expo-task-manager"
 
+var testData = require("./testData.json")
+const axios = require('axios')
+const sampleUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
+const appointmentsListLimit = 2
+
 var jobNames = []     
 
 const makeNewJob = async (distName="", distId="", age="") => {
@@ -109,22 +114,50 @@ const checkSlots = async (distId = "", todayDate = "", age = "") => {
     // var afterURL = id + "&date=" + today
     // const fetchURL = baseURL + afterURL
     console.log('Check Slots')
-    // const fetchURL = "http://192.168.0.109:5000/"
+    const fetchURL = "http://192.168.0.109:5000/"
     // const fetchURL = "http://127.0.0.1:5000/"
-    const fetchURL = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=395&date=13-05-2021"
+    // const fetchURL = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=395&date=14-05-2021"
+    // console.log(testData)
+    const age2 = 45
     try {
-        console.log(fetchURL)
-        const data = await fetch(fetchURL).then(res => res.json());
-        if(data["centers"]){
-            return data.centers.map(center => {
-                return {
-                    ...center,
-                    sessions: center.sessions.filter(session => {
-                        return session.available_capacity>0 && session.min_age_limit<=age;
-                    })
-                } 
-            }).filter(center => center.sessions.length>0)
-        }
+        // pingCowin(fetchURL)
+        axios.get(fetchURL, {headers: {'User-Agent': sampleUserAgent}}).then((result) => {
+            console.log("Axios get")
+            const { centers } = result.data;
+            // let isSlotAvailable = false;
+            let dataOfSlot = "";
+            let appointmentAvailableCount = 0;
+            if (centers.length) {
+                centers.forEach(center => {
+                    center.sessions.forEach((session => {
+                        if (session.min_age_limit <= 45 && session.available_capacity >= 0) {
+                            // IMPLEMENT PUSH NOTIF LOGIC
+                            dataOfSlot = `Hospital Name: ${center.name}\nPincode: ${center.pincode}\nSlots Available: ${session.available_capacity}`
+                            console.log(dataOfSlot)
+                            // isSlotAvailable = true
+                            // appointmentAvailableCount++;
+                            // if (appointmentAvailableCount <= appointmentsListLimit){
+                            //     dataOfSlot = `${dataOfSlot}\nSlot for ${session.available_capacity} is available: ${center.name} on ${session.date}`;
+                            // }
+                        }
+                        // if (isSlotAvailable) {
+                        //     console.log(dataOfSlot)
+                        // }
+                    }))
+                });
+                // if (appointmentAvailableCount - appointmentsListLimit){
+                //     dataOfSlot = `${dataOfSlot}\n${appointmentAvailableCount - appointmentsListLimit} more slots available...`
+                // }
+            } else {
+                console.log("no centers")
+            }
+            // if (isSlotAvailable){
+            //     console.log("FINALLY: ",dataOfSlot)
+            // }
+        }).catch((err) => {
+            console.log("Error: "+err.message);
+        })
+        
     } catch (e) {
         console.log('Fetching failed, tried at: ',fetchURL)
         console.log(e)
@@ -136,15 +169,17 @@ const noname = (distId = "", todayDate = "", age = "") => {
         console.log('defineTask')
         try {
             // fetch data here...
-            const receivedNewData = await checkSlots(distId, todayDate, age)
-            console.log("My task ", receivedNewData)
-            if(receivedNewData) {
-                console.log("got it")
-                return
-            } else {
-                console.log("some error")
-            }
+            // const receivedNewData = await checkSlots(distId, todayDate, age)
+            await checkSlots(distId, todayDate, age)
+            console.log("checking slots")
+            // if(receivedNewData) {
+            //     console.log("got it", receivedNewData)
+            //     return
+            // } else {
+            //     console.log("some error", receivedNewData)
+            // }
         } catch (err) {
+            console.log("noname error block", err)
             return BackgroundFetch.Result.Failed
         }
     })
@@ -157,7 +192,7 @@ const RegisterBackgroundTask = async (distId = "", todayDate = "", age = "") => 
     try {
         noname(distId, todayDate, age)
         await BackgroundFetch.registerTaskAsync(jobNames[jobNames.length - 1].toString(), {
-        minimumInterval: 5, // seconds,
+        minimumInterval: 1, // seconds,
       })
       console.log("Task registered")
     } catch (err) {
