@@ -3,19 +3,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as BackgroundFetch from "expo-background-fetch"
 import * as TaskManager from "expo-task-manager"
 
-var testData = require("./testData.json")
+// var testData = require("./testData.json")
 const axios = require('axios')
 const sampleUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
-const appointmentsListLimit = 2
+// const appointmentsListLimit = 2
 
 var jobNames = []     
 
-const makeNewJob = async (distName="", distId="", age="") => {
+const makeNewJob = async (stName="",distName="", distId="", age="") => {
     var newJob = {}
     try {
         newJob['distName'] = distName
         newJob['distId'] = distId.toString()
         newJob['age'] = age.toString()
+        newJob['stName'] = stName
         return newJob
     } catch (e) {
         console.log('makeNewJob(): ',e)
@@ -26,7 +27,7 @@ const makeNewJob = async (distName="", distId="", age="") => {
 const storeData = async (jobObj) => {
     try {
         const jsonValue = JSON.stringify(jobObj)
-        const key = jobObj["distId"] + "-" + jobObj["age"]
+        const key = "JOB "+jobObj["distId"] + "-" + jobObj["age"]
         if(jobNames.indexOf(key) === -1) jobNames.push(key)
         await AsyncStorage.setItem(key, jsonValue)
     } catch (e) {
@@ -36,10 +37,10 @@ const storeData = async (jobObj) => {
     }
 }
 
-const getData = async (distName="", distId="", age="", todayDate="") => {
+const getData = async (stName="", distName="", distId="", age="", todayDate="") => {
     try {
         // if age === "45+"
-        const key = distId.toString() + "-" + age.toString()
+        const key = "JOB "+ distId.toString() + "-" + age.toString()
         if(jobNames.indexOf(key) === -1) jobNames.push(key)
         const value = await AsyncStorage.getItem(key)
         if(value !== null) {
@@ -49,7 +50,7 @@ const getData = async (distName="", distId="", age="", todayDate="") => {
         } else {
             // if not stored previously
             try {
-                var newJob = await makeNewJob(distName,distId,age)
+                var newJob = await makeNewJob(stName,distName,distId,age)
                 console.log(newJob)
                 let res = await storeData(newJob)
                 let res2 = await RegisterBackgroundTask(distId, todayDate, age)
@@ -67,8 +68,8 @@ const getData = async (distName="", distId="", age="", todayDate="") => {
 }
   
 
-export const addNewJob = async (distName="", distId = "", age = "", todayDate="") => {
-    let res = await getData(distName, distId, age)
+export const addNewJob = async (stName="",distName="", distId = "", age = "", todayDate="") => {
+    let res = await getData(stName,distName, distId, age)
     if(res === -1) { 
         console.log('Check errors')
     } else {
@@ -134,26 +135,12 @@ const checkSlots = async (distId = "", todayDate = "", age = "") => {
                             // IMPLEMENT PUSH NOTIF LOGIC
                             dataOfSlot = `Hospital Name: ${center.name}\nPincode: ${center.pincode}\nSlots Available: ${session.available_capacity}`
                             console.log(dataOfSlot)
-                            // isSlotAvailable = true
-                            // appointmentAvailableCount++;
-                            // if (appointmentAvailableCount <= appointmentsListLimit){
-                            //     dataOfSlot = `${dataOfSlot}\nSlot for ${session.available_capacity} is available: ${center.name} on ${session.date}`;
-                            // }
                         }
-                        // if (isSlotAvailable) {
-                        //     console.log(dataOfSlot)
-                        // }
                     }))
                 });
-                // if (appointmentAvailableCount - appointmentsListLimit){
-                //     dataOfSlot = `${dataOfSlot}\n${appointmentAvailableCount - appointmentsListLimit} more slots available...`
-                // }
             } else {
                 console.log("no centers")
             }
-            // if (isSlotAvailable){
-            //     console.log("FINALLY: ",dataOfSlot)
-            // }
         }).catch((err) => {
             console.log("Error: "+err.message);
         })
@@ -165,19 +152,13 @@ const checkSlots = async (distId = "", todayDate = "", age = "") => {
 }
 const noname = (distId = "", todayDate = "", age = "") => {
     console.log('noname -> defineTask')
+    const nyName = jobNames[jobNames.length - 1]
     TaskManager.defineTask(jobNames[jobNames.length -1].toString(), async (distId, todayDate, age) => {
         console.log('defineTask')
         try {
-            // fetch data here...
-            // const receivedNewData = await checkSlots(distId, todayDate, age)
+            console.log(nyName)
             await checkSlots(distId, todayDate, age)
             console.log("checking slots")
-            // if(receivedNewData) {
-            //     console.log("got it", receivedNewData)
-            //     return
-            // } else {
-            //     console.log("some error", receivedNewData)
-            // }
         } catch (err) {
             console.log("noname error block", err)
             return BackgroundFetch.Result.Failed
@@ -198,8 +179,4 @@ const RegisterBackgroundTask = async (distId = "", todayDate = "", age = "") => 
     } catch (err) {
       console.log("Task Register failed:", err)
     }
-  }
-
-// exports.addNewJob = addNewJob;
-// exports.timeOut = timeOut;
-// export {addNewJob, timeOut}
+}

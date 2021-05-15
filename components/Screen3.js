@@ -1,10 +1,27 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, ScrollView, FlatList, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, ScrollView, FlatList, TouchableHighlight, Button } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import BasicContainer from "./BasicContainer"
 import JobItem from "./JobItem"
 import { useNavigation } from '@react-navigation/native';
+import { getExpoPushTokenAsync } from 'expo-notifications';
+
+getAllKeys = async () => {
+    let keys = []
+    try {
+      keys = await AsyncStorage.getAllKeys()
+    } catch(e) {
+      // read key error
+      console.log(e.message)
+    }
+  
+    console.log(keys)
+    // example console.log result:
+    // ['@MyApp_user', '@MyApp_key']
+}
+
 
 function Screen3(props) {
 
@@ -23,6 +40,10 @@ function Screen3(props) {
     return (
         <View style={styles.container}>
             <BasicContainer>
+                <Button 
+                    title="Get keys"
+                    onPress={() => getAllKeys()}
+                />
                 <View style={{height: "85%"}}>
                     <FlatList 
                         data={jobList}

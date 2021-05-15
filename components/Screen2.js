@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Modal, FlatList, Button, TouchableHighlight } from 'react-native';
+import { View, StyleSheet, Modal, FlatList, Button, TouchableHighlight, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import * as TaskManager from "expo-task-manager"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
 
 import BasicContainer from "./BasicContainer"
 import Card from "./Card"
 import ListItem from "./ListItem"
 import { useNavigation } from '@react-navigation/native';
 import { addNewJob } from "../config/Functions"
+const axios = require('axios')
 
 let data1 = require('../config/States')
 let states = data1.states
@@ -16,13 +19,71 @@ let states = data1.states
 let data2 = require('../config/Districts')
 let districts = data2.districts
 
+async function registerForPushNOtifications() {
+    let token;
+    if(Constants.isDevice){
+        const { status : existingStatus} = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if(existingStatus !== 'granted'){
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+        }
+        if (finalStatus !== 'granted') {
+            Alert.alert("Permissions not granted","failed to get push token for push notifs",[{text: "ok"}])
+            return;
+        }
+        token = (await Notifications.getExpoPushTokenAsync()).data;
+        console.log(token);
+        // {setToken && setToken(token)}
+        // const key = "pushToken"
+        try {
+            await AsyncStorage.setItem("pushToken", token)
+        } catch (e) {
+            console.log("Error in storing token", e)
+        }
+    } else {
+        alert("Must be a physical Device!")
+    }
+}
+
+const sendPushNotifs = () => {
+    let response = fetch("https://exp.host/--/api/v2/push/send", {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type':'application/json'
+        },
+        body: JSON.stringify({
+            to: "token",
+            title: "demo",
+            body: "some info"
+        })
+    })
+}
+
+async function checkToken(token) {
+    try {
+        const token = await AsyncStorage.getItem("pushToken")
+        if(token === null) {
+            console.log("token does not exists")
+            registerForPushNOtifications()
+        } else {
+            console.log(token)
+        }
+    } catch (err) {
+        console.log("checkToken ",err)
+    }
+}
+
 function Screen2(props) {
 
     useEffect(() => {
         TaskManager.unregisterAllTasksAsync()
         AsyncStorage.clear()
+        checkToken()
     },[])
-
+    
+    const [pushToken, setPushToken] = useState('');
     const [stateModal, setStateModal] = useState(false);
     const [distModal, setDistModal] = useState(false);
     const [chooseState, setChooseState] = useState("Select a State");
@@ -32,6 +93,7 @@ function Screen2(props) {
     const [distId, setDistId] = useState("0")
     const [ageModal, setAgeModal] = useState(false)
     const [age, setAge] = useState("Select Age Bracket")
+    // const []
 
     const ageBracket = [{age: "18-45"},{age: "45+"}]
 
@@ -45,6 +107,10 @@ function Screen2(props) {
         <>
             <View style={styles.container}>
                 <BasicContainer>
+                    <Button 
+                        title="Send Notif"
+                        onPress={() => sendNotif()}
+                    />
                     <Card 
                         type="STATE" 
                         setModal={setStateModal}
@@ -64,7 +130,7 @@ function Screen2(props) {
                         activeOpacity={0.8}
                         underlayColor="#005A9C"
                         onPress={() => {
-                            addNewJob(chooseDist,distId,age)
+                            addNewJob(chooseState,chooseDist,distId,age)
                             navigation.navigate('screen3')
                             }}
                         style={{
