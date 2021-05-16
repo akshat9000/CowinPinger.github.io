@@ -5,11 +5,12 @@ import * as TaskManager from "expo-task-manager"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
+import { useNavigation } from '@react-navigation/native';
+// import { MaterialIcons } from '@expo/vector-icons';
 
 import BasicContainer from "./BasicContainer"
 import Card from "./Card"
 import ListItem from "./ListItem"
-import { useNavigation } from '@react-navigation/native';
 import { addNewJob } from "../config/Functions"
 const axios = require('axios')
 
@@ -83,6 +84,7 @@ function Screen2(props) {
         checkToken()
     },[])
     
+    const navigation = useNavigation()
     const [pushToken, setPushToken] = useState('');
     const [stateModal, setStateModal] = useState(false);
     const [distModal, setDistModal] = useState(false);
@@ -97,7 +99,6 @@ function Screen2(props) {
 
     const ageBracket = [{age: "18-45"},{age: "45+"}]
 
-    const navigation = useNavigation()
 
     const onPress = (name) => {
         console.log(name)
@@ -107,10 +108,6 @@ function Screen2(props) {
         <>
             <View style={styles.container}>
                 <BasicContainer>
-                    <Button 
-                        title="Send Notif"
-                        onPress={() => sendNotif()}
-                    />
                     <Card 
                         type="STATE" 
                         setModal={setStateModal}
@@ -125,21 +122,37 @@ function Screen2(props) {
                         type="AGE BRACKET" 
                         setModal={setAgeModal}
                         value={age}
-                    />      
-                    <TouchableHighlight
-                        activeOpacity={0.8}
-                        underlayColor="#005A9C"
-                        onPress={() => {
-                            addNewJob(chooseState,chooseDist,distId,age)
-                            navigation.navigate('screen3')
-                            }}
-                        style={{
+                    />   
+                    <View style={{
+                            flexDirection:"row",
                             position: "absolute",
                             bottom: 20
-                        }}
-                    >
-                        <AntDesign name="plussquareo" size={40} color="dodgerblue" />        
-                    </TouchableHighlight>
+                        }}>
+                        <TouchableHighlight
+                            activeOpacity={0.8}
+                            underlayColor="#005A9C"
+                            onPress={() => {
+                                addNewJob(chooseState,chooseDist,distId,age)
+                                }}
+                            style={{
+                                marginHorizontal: 20
+                            }}
+                        >
+                            <AntDesign name="plussquareo" size={40} color="dodgerblue" />        
+                        </TouchableHighlight>  
+                        <TouchableHighlight
+                            activeOpacity={0.8}
+                            underlayColor="#005A9C"
+                            onPress={() => {
+                                navigation.navigate('screen3')
+                                }}
+                            style={{
+                                marginHorizontal:20
+                            }}
+                        >
+                            <AntDesign name="checksquareo" size={40} color="dodgerblue" />   
+                        </TouchableHighlight>                         
+                    </View>   
                 </BasicContainer>
             </View>
             <Modal visible={stateModal} animationType="slide">

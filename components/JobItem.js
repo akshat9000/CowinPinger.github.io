@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, TouchableHighlight, Text } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
-function JobItem({ onPress, state, name }) {
+function JobItem({ onPress, state, name, age }) {
     return (
         <View style={styles.container}>
             <View style={styles.detailsContainer}>
@@ -10,8 +10,13 @@ function JobItem({ onPress, state, name }) {
                     <View style={styles.state}>
                         <Text style={{fontWeight: "bold", fontSize: 20}}>{state}</Text>
                     </View>
-                    <View style={styles.state}>
-                        <Text>District - {name}</Text>
+                    <View style={styles.stateDeets}>
+                        <View>
+                            <Text>District - {name}</Text>
+                        </View>
+                        <View>
+                            <Text>Age - {age === "45" ? "45+" : "18-45"}</Text>
+                        </View>
                     </View>
                 </View>
                 <TouchableHighlight 
@@ -65,6 +70,13 @@ const styles = StyleSheet.create({
         height: "50%", 
         justifyContent: "center", 
         alignItems: "center"
+    },
+    stateDeets: {
+        width: "100%", 
+        height: "25%", 
+        justifyContent: "center", 
+        alignItems: "center",
+        marginBottom: 0
     }
 })
 

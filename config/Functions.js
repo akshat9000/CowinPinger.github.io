@@ -2,13 +2,16 @@ import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as BackgroundFetch from "expo-background-fetch"
 import * as TaskManager from "expo-task-manager"
+import axios from 'axios';
+
 
 // var testData = require("./testData.json")
-const axios = require('axios')
+// const axios = require('axios')
 const sampleUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
 // const appointmentsListLimit = 2
 
 var jobNames = []     
+
 
 const makeNewJob = async (stName="",distName="", distId="", age="") => {
     var newJob = {}
@@ -69,6 +72,7 @@ const getData = async (stName="", distName="", distId="", age="", todayDate="") 
   
 
 export const addNewJob = async (stName="",distName="", distId = "", age = "", todayDate="") => {
+    age = age.slice(0,2)
     let res = await getData(stName,distName, distId, age)
     if(res === -1) { 
         console.log('Check errors')
@@ -90,7 +94,7 @@ export const addNewJob = async (stName="",distName="", distId = "", age = "", to
                 "Job added successfully",
                 [
                     {
-                        text: "ok"
+                        text: "ok",
                     }
                 ]
             )
@@ -119,8 +123,9 @@ const checkSlots = async (distId = "", todayDate = "", age = "") => {
     // const fetchURL = "http://127.0.0.1:5000/"
     // const fetchURL = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=395&date=14-05-2021"
     // console.log(testData)
-    const age2 = 45
     try {
+        const lowerLimit = (age === "18") ? 18 : 45
+        const upperLimit = (age === "18") ? 45 : 150
         // pingCowin(fetchURL)
         axios.get(fetchURL, {headers: {'User-Agent': sampleUserAgent}}).then((result) => {
             console.log("Axios get")
@@ -131,9 +136,10 @@ const checkSlots = async (distId = "", todayDate = "", age = "") => {
             if (centers.length) {
                 centers.forEach(center => {
                     center.sessions.forEach((session => {
-                        if (session.min_age_limit <= 45 && session.available_capacity >= 0) {
+                        if (session.min_age_limit >= lowerLimit && session.min_age_limit < upperLimit && session.available_capacity >= 0) {
                             // IMPLEMENT PUSH NOTIF LOGIC
-                            dataOfSlot = `Hospital Name: ${center.name}\nPincode: ${center.pincode}\nSlots Available: ${session.available_capacity}`
+                            dataOfSlot = `Hospital Name: ${center.name}\nPincode: ${center.pincode}\nSlots Available: ${session.available_capacity}\nMin age limit: ${session.min_age_limit}\nVAccine: ${session.vaccine}`
+                            sendNotif(dataOfSlot)
                             console.log(dataOfSlot)
                         }
                     }))
@@ -173,10 +179,38 @@ const RegisterBackgroundTask = async (distId = "", todayDate = "", age = "") => 
     try {
         noname(distId, todayDate, age)
         await BackgroundFetch.registerTaskAsync(jobNames[jobNames.length - 1].toString(), {
-        minimumInterval: 1, // seconds,
+            minimumInterval: 1, // seconds,
       })
       console.log("Task registered")
     } catch (err) {
-      console.log("Task Register failed:", err)
+        console.log("Task Register failed:", err)
+    }
+}
+
+
+
+// const token = "ExponentPushToken[RElLO-POXyzWgCSBVYsS9D]"
+// const token = await AsyncStorage.getItem("pushToken")
+const api = "https://exp.host/--/api/v2/push/send"
+
+async function sendNotif(data) {
+    try{
+        const token = await AsyncStorage.getItem('pushToken')
+        if(token !== null){
+            try {
+                axios.post(api, {
+                    to: token,
+                    body: data,
+                    title:"Slot Available!"
+                })
+                .then(result => console.log(result.data))
+            } catch(e) {
+                console.log(e)
+            }
+        } else {
+            console.log("token returned null")
+        }
+    } catch (e) {
+        console.log("sendNotif error: ",e.message)
     }
 }
