@@ -105,30 +105,33 @@ export const addNewJob = async (stName="",distName="", distId = "", age = "", to
 // exports.addNewJob = addNewJob;
 
 const getDate = async () => {
-    var date = new Date().getDate()
-    var month = new Date().getMonth() + 1
+    var date = ("0" + new Date().getDate()).slice(-2)
+    var month = ("0" + (new Date().getMonth() + 1)).slice(-2)
     var year = new Date().getFullYear()
 
-    return date + '-' + month + '-' + year
+    return (date + '-' + month + '-' + year).toString()
 }
 
-const checkSlots = async (distId = "", todayDate = "", age = "") => {
+const checkSlots = async (distId = "", todayDate = "", age) => {
     // const baseURL = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id="
     // const id = distId.toString()
-    // const today = todayDate.toString()
+    const today = await getDate()
+    // console.log("**************",distId)
+    // console.log("**********************Date today: ",today)
     // var afterURL = id + "&date=" + today
     // const fetchURL = baseURL + afterURL
-    console.log('Check Slots')
-    const fetchURL = "http://192.168.0.109:5000/"
+    // console.log('Check Slots')
+    // const fetchURL = "http://192.168.0.109:5000/"
     // const fetchURL = "http://127.0.0.1:5000/"
-    // const fetchURL = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=395&date=14-05-2021"
+    const fetchURL = `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=${distId}&date=${today}`
     // console.log(testData)
     try {
         const lowerLimit = (age === "18") ? 18 : 45
         const upperLimit = (age === "18") ? 45 : 150
+        // console.log(age, upperLimit, lowerLimit)
         // pingCowin(fetchURL)
         axios.get(fetchURL, {headers: {'User-Agent': sampleUserAgent}}).then((result) => {
-            console.log("Axios get")
+            // console.log("Axios get")
             const { centers } = result.data;
             // let isSlotAvailable = false;
             let dataOfSlot = "";
@@ -136,11 +139,12 @@ const checkSlots = async (distId = "", todayDate = "", age = "") => {
             if (centers.length) {
                 centers.forEach(center => {
                     center.sessions.forEach((session => {
-                        if (session.min_age_limit >= lowerLimit && session.min_age_limit < upperLimit && session.available_capacity >= 0) {
+                        if (session.min_age_limit >= lowerLimit && session.min_age_limit < upperLimit && session.available_capacity > 0) {
+                            // console.log(session.min_age_limit)
                             // IMPLEMENT PUSH NOTIF LOGIC
                             dataOfSlot = `Hospital Name: ${center.name}\nPincode: ${center.pincode}\nSlots Available: ${session.available_capacity}\nMin age limit: ${session.min_age_limit}\nVAccine: ${session.vaccine}`
                             sendNotif(dataOfSlot)
-                            console.log(dataOfSlot)
+                            // console.log(dataOfSlot)
                         }
                     }))
                 });
@@ -152,36 +156,53 @@ const checkSlots = async (distId = "", todayDate = "", age = "") => {
         })
         
     } catch (e) {
-        console.log('Fetching failed, tried at: ',fetchURL)
+        // console.log('Fetching failed, tried at: ',fetchURL)
         console.log(e)
     }
 }
-const noname = (distId = "", todayDate = "", age = "") => {
-    console.log('noname -> defineTask')
+
+const someName = async (distId, todayDate, age) => {
+    try {
+        // console.log(nyName)
+        await checkSlots(distId, todayDate, age)
+        // console.log("checking slots")
+    } catch (err) {
+        console.log("noname error block", err)
+        return BackgroundFetch.Result.Failed
+    }
+}
+
+const noname = (distId, todayDate, age) => {
+    // console.log('noname -> defineTask')
     const nyName = jobNames[jobNames.length - 1]
-    TaskManager.defineTask(jobNames[jobNames.length -1].toString(), async (distId, todayDate, age) => {
-        console.log('defineTask')
-        try {
-            console.log(nyName)
-            await checkSlots(distId, todayDate, age)
-            console.log("checking slots")
-        } catch (err) {
-            console.log("noname error block", err)
-            return BackgroundFetch.Result.Failed
-        }
+    TaskManager.defineTask(jobNames[jobNames.length -1].toString(),() => {
+        someName(distId, todayDate, age)
     })
 }
 
 
+// async (distId, todayDate, age) => {
+// // console.log('defineTask')
+// try {
+//     // console.log(nyName)
+//     await checkSlots(distId, todayDate, age)
+//     // console.log("checking slots")
+// } catch (err) {
+//     console.log("noname error block", err)
+//     return BackgroundFetch.Result.Failed
+// }
+// }
 
-const RegisterBackgroundTask = async (distId = "", todayDate = "", age = "") => {
-    console.log('RegisterBackgroundTask...')
+
+
+const RegisterBackgroundTask = async (distId, todayDate, age) => {
+    // console.log('RegisterBackgroundTask...')
     try {
         noname(distId, todayDate, age)
         await BackgroundFetch.registerTaskAsync(jobNames[jobNames.length - 1].toString(), {
             minimumInterval: 1, // seconds,
       })
-      console.log("Task registered")
+    //   console.log("Task registered")
     } catch (err) {
         console.log("Task Register failed:", err)
     }
