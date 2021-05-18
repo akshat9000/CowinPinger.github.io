@@ -3,17 +3,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as BackgroundFetch from "expo-background-fetch"
 import * as TaskManager from "expo-task-manager"
 import axios from 'axios';
+import * as Notifications from 'expo-notifications';
 
-
-// var testData = require("./testData.json")
-// const axios = require('axios')
 const sampleUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
-// const appointmentsListLimit = 2
-
 var jobNames = []     
-
+const api = "https://exp.host/--/api/v2/push/send"
 
 const makeNewJob = async (stName="",distName="", distId="", age="") => {
+    // MAKES A NEW JOB OBJECT
     var newJob = {}
     try {
         newJob['distName'] = distName
@@ -28,6 +25,7 @@ const makeNewJob = async (stName="",distName="", distId="", age="") => {
 }
 
 const storeData = async (jobObj) => {
+    // STORES JOB OBJECT INTO ASYNCSTORAGE AS JSON STRING
     try {
         const jsonValue = JSON.stringify(jobObj)
         const key = "JOB "+jobObj["distId"] + "-" + jobObj["age"]
@@ -41,8 +39,8 @@ const storeData = async (jobObj) => {
 }
 
 const getData = async (stName="", distName="", distId="", age="", todayDate="") => {
+    // CHECKS IF GIVEN JOB EXISTS OR NOT. IF NOT, IT ADDS IT TO THE JOB LIST. ELSE, NOTIFIES EXISTENCE
     try {
-        // if age === "45+"
         const key = "JOB "+ distId.toString() + "-" + age.toString()
         if(jobNames.indexOf(key) === -1) jobNames.push(key)
         const value = await AsyncStorage.getItem(key)
@@ -72,7 +70,8 @@ const getData = async (stName="", distName="", distId="", age="", todayDate="") 
   
 
 export const addNewJob = async (stName="",distName="", distId = "", age = "", todayDate="") => {
-    age = age.slice(0,2)
+    // COMBINES FUNCTIONALITY OF GETTING DATA AND STORING DATA
+    age = age.slice(0,2) // if age === "18-45" returns 18. else if age === "45+", returns 45
     let res = await getData(stName,distName, distId, age)
     if(res === -1) { 
         console.log('Check errors')
@@ -102,49 +101,33 @@ export const addNewJob = async (stName="",distName="", distId = "", age = "", to
     }
 }
 
-// exports.addNewJob = addNewJob;
-
 const getDate = async () => {
+    // RETURNS THE CURRENT DATE IN STRING FORMAT
     var date = ("0" + new Date().getDate()).slice(-2)
     var month = ("0" + (new Date().getMonth() + 1)).slice(-2)
     var year = new Date().getFullYear()
-
     return (date + '-' + month + '-' + year).toString()
 }
 
 const checkSlots = async (distId = "", todayDate = "", age) => {
-    // const baseURL = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id="
-    // const id = distId.toString()
     const today = await getDate()
-    // console.log("**************",distId)
-    // console.log("**********************Date today: ",today)
-    // var afterURL = id + "&date=" + today
-    // const fetchURL = baseURL + afterURL
-    // console.log('Check Slots')
-    // const fetchURL = "http://192.168.0.109:5000/"
-    // const fetchURL = "http://127.0.0.1:5000/"
-    const fetchURL = `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=${distId}&date=${today}`
-    // console.log(testData)
+    const fetchURL = "http://192.168.0.109:5000/" // TESTING SERVER
+    // const fetchURL = `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=${distId}&date=${today}` // PRODUCTION SERVER
+    console.log("***********Fetching at : ",fetchURL)
     try {
         const lowerLimit = (age === "18") ? 18 : 45
-        const upperLimit = (age === "18") ? 45 : 150
-        // console.log(age, upperLimit, lowerLimit)
-        // pingCowin(fetchURL)
+        const upperLimit = (age === "18") ? 45 : 150 // required to check age range
         axios.get(fetchURL, {headers: {'User-Agent': sampleUserAgent}}).then((result) => {
-            // console.log("Axios get")
             const { centers } = result.data;
-            // let isSlotAvailable = false;
             let dataOfSlot = "";
-            let appointmentAvailableCount = 0;
             if (centers.length) {
                 centers.forEach(center => {
                     center.sessions.forEach((session => {
+                        // console.log(session)
                         if (session.min_age_limit >= lowerLimit && session.min_age_limit < upperLimit && session.available_capacity > 0) {
-                            // console.log(session.min_age_limit)
-                            // IMPLEMENT PUSH NOTIF LOGIC
-                            dataOfSlot = `Hospital Name: ${center.name}\nPincode: ${center.pincode}\nSlots Available: ${session.available_capacity}\nMin age limit: ${session.min_age_limit}\nVAccine: ${session.vaccine}`
-                            sendNotif(dataOfSlot)
-                            // console.log(dataOfSlot)
+                            dataOfSlot = `Hospital Name: ${center.name}\nPincode: ${center.pincode}\nSlots Available: ${session.available_capacity}\nDate: ${session.date}\nMin age limit: ${session.min_age_limit}\nVAccine: ${session.vaccine}`
+                            // sendNotif(dataOfSlot) 
+                            localNotif(dataOfSlot) 
                         }
                     }))
                 });
@@ -156,16 +139,14 @@ const checkSlots = async (distId = "", todayDate = "", age) => {
         })
         
     } catch (e) {
-        // console.log('Fetching failed, tried at: ',fetchURL)
         console.log(e)
     }
 }
 
 const someName = async (distId, todayDate, age) => {
+    // FUNCTION WRAPPER FOR CHECKSLOTS FUNCTION
     try {
-        // console.log(nyName)
         await checkSlots(distId, todayDate, age)
-        // console.log("checking slots")
     } catch (err) {
         console.log("noname error block", err)
         return BackgroundFetch.Result.Failed
@@ -173,65 +154,80 @@ const someName = async (distId, todayDate, age) => {
 }
 
 const noname = (distId, todayDate, age) => {
-    // console.log('noname -> defineTask')
+    // FUNCTION WRAPPER USED TO REGISTER TASK WITH TASK MANAGER
     const nyName = jobNames[jobNames.length - 1]
     TaskManager.defineTask(jobNames[jobNames.length -1].toString(),() => {
         someName(distId, todayDate, age)
     })
 }
 
-
-// async (distId, todayDate, age) => {
-// // console.log('defineTask')
-// try {
-//     // console.log(nyName)
-//     await checkSlots(distId, todayDate, age)
-//     // console.log("checking slots")
-// } catch (err) {
-//     console.log("noname error block", err)
-//     return BackgroundFetch.Result.Failed
-// }
-// }
-
-
-
 const RegisterBackgroundTask = async (distId, todayDate, age) => {
-    // console.log('RegisterBackgroundTask...')
+    // REGISTERS A BACKGROUND TASK WITH THE TASK MANAGER. ALSO SPECIFIES THE CHECKING FREQUENCY
     try {
         noname(distId, todayDate, age)
         await BackgroundFetch.registerTaskAsync(jobNames[jobNames.length - 1].toString(), {
             minimumInterval: 1, // seconds,
       })
-    //   console.log("Task registered")
     } catch (err) {
         console.log("Task Register failed:", err)
     }
 }
 
+const localNotif = async (data) => {
+    const content = {
+        body: data,
+        title: "Slot Available!"
+    }
+    Notifications.scheduleNotificationAsync({ content, trigger: null });
+}
+
+// async function sendNotif(data) {
+//     // USES AXIOS TO CALL THE EXPO PUSH NOTIFICATION API WITH THE GIVEN DATA TO GENERATE A PUSH NOTIFICATION
+//     try{
+//         const token = await AsyncStorage.getItem('pushToken')
+//         if(token !== null){
+//             try {
+//                 axios.post(api, {
+//                     to: token,
+//                     body: data,
+//                     title:"Slot Available!"
+//                 })
+//                 .then(result => console.log(result.data))
+//             } catch(e) {
+//                 console.log(e)
+//             }
+//         } else {
+//             console.log("token returned null")
+//         }
+//     } catch (e) {
+//         console.log("sendNotif error: ",e.message)
+//     }
+// }
 
 
-// const token = "ExponentPushToken[RElLO-POXyzWgCSBVYsS9D]"
-// const token = await AsyncStorage.getItem("pushToken")
-const api = "https://exp.host/--/api/v2/push/send"
-
-async function sendNotif(data) {
+export const unRegister = async (distId, age, name) => {
+    //UNREGISTERs A BACKGROUND TASK FROM BACKGROUNDFETCH
+    const ageBracket = (age === "18") ? "18-45" : "45+"
     try{
-        const token = await AsyncStorage.getItem('pushToken')
-        if(token !== null){
-            try {
-                axios.post(api, {
-                    to: token,
-                    body: data,
-                    title:"Slot Available!"
-                })
-                .then(result => console.log(result.data))
-            } catch(e) {
-                console.log(e)
-            }
-        } else {
-            console.log("token returned null")
+        const key = `JOB ${distId}-${age}`
+        try{
+            const remove = await AsyncStorage.removeItem(key)
+            // const letsee = await AsyncStorage.getAllKeys().then(res => console.log(res))
+        } catch(e){
+            console.log('key removal error',e.message)
         }
-    } catch (e) {
-        console.log("sendNotif error: ",e.message)
+        BackgroundFetch.unregisterTaskAsync(key)
+            .then(res => {
+                console.log(res)
+                const id = jobNames.indexOf(key)
+                if (id > -1) jobNames.splice(id, 1)
+                Alert.alert(
+                    "Job Deleted",
+                    `You will no longer receive notifications for ${name} district for the age bracket of ${ageBracket}`,
+                    [{text: "OK"}]
+                )
+            })
+    } catch(e) {
+        console.log("error unregistering ",e.message)
     }
 }

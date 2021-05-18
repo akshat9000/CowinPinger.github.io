@@ -1,8 +1,13 @@
 import React from 'react';
 import { View, StyleSheet, TouchableHighlight, Text } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import { unRegister } from "../config/Functions"
+import { useNavigation } from '@react-navigation/native';
 
-function JobItem({ onPress, state, name, age }) {
+function JobItem({ state, name, age, distId, toggle, setToggle }) {
+    
+    const navigation = useNavigation()
+
     return (
         <View style={styles.container}>
             <View style={styles.detailsContainer}>
@@ -21,7 +26,11 @@ function JobItem({ onPress, state, name, age }) {
                 </View>
                 <TouchableHighlight 
                     style={styles.delete}
-                    onPress={onPress}
+                    onPress={() => {
+                        unRegister(distId, age, name)
+                        setToggle(!toggle)
+                        navigation.navigate('screen3')
+                        }}
                     activeOpacity={0.8}
                     underlayColor="#005A9C"
                 >

@@ -5,14 +5,12 @@ import BasicContainer from "./BasicContainer"
 import Title from "./Title"
 import Info from "./Info"
 
-function Screen1({ onPress }) {
+function Screen1() {
     return (
         <View style={styles.container}>
             <BasicContainer>
                 <Title />
-                <Info 
-                    onPress={onPress}
-                />
+                <Info />
             </BasicContainer>
         </View>
     );

@@ -47,21 +47,6 @@ async function registerForPushNOtifications() {
     }
 }
 
-const sendPushNotifs = () => {
-    let response = fetch("https://exp.host/--/api/v2/push/send", {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type':'application/json'
-        },
-        body: JSON.stringify({
-            to: "token",
-            title: "demo",
-            body: "some info"
-        })
-    })
-}
-
 async function checkToken(token) {
     try {
         const token = await AsyncStorage.getItem("pushToken")
@@ -77,6 +62,16 @@ async function checkToken(token) {
 }
 
 function Screen2(props) {
+
+    Notifications.setNotificationHandler({
+        handleNotification: async () => {
+            return {
+                shouldShowAlert: true,
+                shouldPlaySound: true,
+                shouldSetBadge: true,
+            };
+        },
+    });
 
     useEffect(() => {
         TaskManager.unregisterAllTasksAsync()
@@ -169,7 +164,7 @@ function Screen2(props) {
                             setStateId(item.state_id)
                             // console.log(stateId)
                             setStateModal(false)
-                            const res = districts.filter(dist => dist.state_id === item.state_id)
+                            // const res = districts.filter(dist => dist.state_id === item.state_id)
                             // console.log(res[0].districts)
                             setDistList(res[0].districts)
                         }}

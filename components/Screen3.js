@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BasicContainer from "./BasicContainer"
 import JobItem from "./JobItem"
 import { useNavigation } from '@react-navigation/native';
-import { getExpoPushTokenAsync } from 'expo-notifications';
+
 
 const getAllKeys = async () => {
     let keys = []
@@ -20,52 +20,40 @@ const getAllKeys = async () => {
     }
 }
 
-const getJobKeys = async () => {
-    try {
-        const jobKeys = []
-        const keys = await getAllKeys()
-        jobKeys = keys.filter(key => key.slice(0,3).toString() === "JOB")
-        return jobKeys
-    } catch (e) {
-        console.log("Error in getJobKeys: ", e.message)
-    }
-}
+// const getJobKeys = async () => {
+//     try {
+//         const jobKeys = []
+//         const keys = await getAllKeys()
+//         jobKeys = keys.filter(key => key.slice(0,3).toString() === "JOB")
+//         return jobKeys
+//     } catch (e) {
+//         console.log("Error in getJobKeys: ", e.message)
+//     }
+// }
 
-const getList = async () => {
-    const list2 = await getJobKeys()
-        .then(list => {return list.map(async (key) =>{
-                try {
-                    const job = {}
-                    const jobJSON = await AsyncStorage.getItem(key)
-                    const jobJSONTemp = JSON.parse(jobJSON)
-                    job['state'] = jobJSONTemp['stName']
-                    job['dist'] = jobJSONTemp['distId']
-                    job['name'] = jobJSONTemp['distName']
-                    return job
-                } catch(e) {
-                    console.log("useEffect -> map ", e.message)
-                }
-            })
-        })
-    // const list = list2.map(async (key) => {
-    // })
-    return list
-}
+// const getList = async () => {
+//     const list2 = await getJobKeys()
+//         .then(list => {return list.map(async (key) =>{
+//                 try {
+//                     const job = {}
+//                     const jobJSON = await AsyncStorage.getItem(key)
+//                     const jobJSONTemp = JSON.parse(jobJSON)
+//                     job['state'] = jobJSONTemp['stName']
+//                     job['dist'] = jobJSONTemp['distId']
+//                     job['name'] = jobJSONTemp['distName']
+//                     return job
+//                 } catch(e) {
+//                     console.log("useEffect -> map ", e.message)
+//                 }
+//             })
+//         })
+//     return list
+// }
 
 function Screen3(props) {
     
-    // const list = [{state:"maharashtra", dist: "395", name:"mumbai"},{state:"gujrat", dist: "396", name:"mumbai"},{state:"maharashtra", dist: "397", name:"mumbai"},{state:"gujrat", dist: "398", name:"mumbai"},{state:"maharashtra", dist: "399", name:"mumbai"},{state:"gujrat", dist: "400", name:"mumbai"},{state:"maharashtra", dist: "390", name:"mumbai"}]
-    // const keyList = []
-    // const list = []
-    
-    
+    const [toggle, setToggle] = useState(true)
     const navigation = useNavigation()
-    
-    const onPress = (dist_id) => {
-        // EXECUTE DELETING LOGIC FOR BACKGROUND PROCESS
-        const res = jobList.filter(item => item.dist !== dist_id)
-        setJobList(res)
-    }
     const [jobList, setJobList] = useState()
     
     useEffect(() => {
@@ -85,22 +73,18 @@ function Screen3(props) {
                     const job = {}
                     const storedJobString = await AsyncStorage.getItem(jobKeys[i])
                     const storedJob = JSON.parse(storedJobString)
-                    // console.log(storedJob)
                     job['state'] = storedJob['stName']
                     job['dist'] = storedJob['distId']
                     job['name'] = storedJob['distName']
-                    job['key'] = storedJob['distId'] + "-" + storedJob['age']
+                    job['key'] = "JOB "+storedJob['distId'] + "-" + storedJob['age']
                     job['age'] = storedJob['age']
-                    // console.log(job)
                     list.push(job)
                 }
             }
             console.log(list)
         }
         getKeys()
-        // getList()
-        //     .then(list => this.useState(list))
-    },[])
+    },[toggle])
     
     return (
         <View style={styles.container}>
@@ -110,10 +94,12 @@ function Screen3(props) {
                         data={jobList}
                         keyExtractor={item => item.key}
                         renderItem={({item}) => <JobItem 
-                            onPress={() => onPress(item.dist)}
                             state={item.state}
                             name={item.name}
                             age={item.age}
+                            distId={item.dist}
+                            toggle={toggle}
+                            setToggle={setToggle}
                         />}
                     />
                 </View>

@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Text, View, StyleSheet, Button, Alert, TouchableHighlight } from 'react-native';
 
-function Info({ onPress }) {
+function Info() {
 
     const navigation = useNavigation()
 
@@ -50,14 +50,15 @@ function Info({ onPress }) {
 const styles = StyleSheet.create({
     buttonContainer:{
         padding: 10,
-        alignItems: "center"
+        alignItems: "center",
+        width: "100%",
     },
     buttonView: {
-        width: "50%",
         alignItems: "center",
         backgroundColor: "#1e90ff",
         padding: 5,
         borderRadius: 15,
+        // flex: 1
     },
     button:{
         width: "50%"
