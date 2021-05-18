@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Text, View, StyleSheet, Button, Alert, TouchableHighlight } from 'react-native';
+import { Text, View, StyleSheet, TouchableHighlight } from 'react-native';
 
 function Info() {
 
@@ -23,7 +23,7 @@ function Info() {
                         The script checks the CoWin API every 1 minute
                     </Text>
                     <Text style={styles.text}>
-                        Please suggest a better name for this app to the devs, if you have one, via twitter @Akshat_Srivastava
+                        Please suggest a better name for the app, or raise any issues to the dev via twitter @AkshatS40322105, or via email - vaxslots.dev@gmail.com
                     </Text>
                 </View>
             </View>

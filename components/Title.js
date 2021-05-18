@@ -1,11 +1,15 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, Image } from 'react-native';
 import { AntDesign } from '@expo/vector-icons'; 
 
 function Title(props) {
     return (
         <View style={styles.container}>
-            <AntDesign name="slack" size={44} color="black" />
+
+            <Image 
+            	style={{width:100, height:100, marginBottom:15}}
+            	source={require("../assets/logo.png")}
+            />
             <Text style={styles.text}>
                 CoWin Slot Pinger
             </Text>

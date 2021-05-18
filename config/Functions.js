@@ -2,12 +2,43 @@ import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as BackgroundFetch from "expo-background-fetch"
 import * as TaskManager from "expo-task-manager"
-import axios from 'axios';
-import * as Notifications from 'expo-notifications';
+import axios from 'axios'; 
+import { scheduleNotificationAsync } from 'expo-notifications';
 
 const sampleUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
-var jobNames = []     
-const api = "https://exp.host/--/api/v2/push/send"
+var jobNames = []
+
+export const addNewJob = async (stName="",distName="", distId = "", age = "", todayDate="") => {
+    // COMBINES FUNCTIONALITY OF GETTING DATA AND STORING DATA
+    age = age.slice(0,2) // if age === "18-45" returns 18. else if age === "45+", returns 45
+    let res = await getData(stName,distName, distId, age)
+    if(res === -1) { 
+        console.log('Check errors')
+    } else {
+        if(res === 0) {
+            Alert.alert(
+                "Job Already Exists",
+                "You have already set a pinger for this district",
+                [
+                    {
+                        text: "OK"
+                    }
+                ]
+            )
+        }
+        else {
+            Alert.alert(
+                "Job Added!",
+                "Job added successfully!\n\nYou can either push app to background or add more jobs!\n\nNOTE: You will get notifications only when the app is in the background",
+                [
+                    {
+                        text: "ok",
+                    }
+                ]
+            )
+        }
+    }
+}
 
 const makeNewJob = async (stName="",distName="", distId="", age="") => {
     // MAKES A NEW JOB OBJECT
@@ -69,37 +100,6 @@ const getData = async (stName="", distName="", distId="", age="", todayDate="") 
 }
   
 
-export const addNewJob = async (stName="",distName="", distId = "", age = "", todayDate="") => {
-    // COMBINES FUNCTIONALITY OF GETTING DATA AND STORING DATA
-    age = age.slice(0,2) // if age === "18-45" returns 18. else if age === "45+", returns 45
-    let res = await getData(stName,distName, distId, age)
-    if(res === -1) { 
-        console.log('Check errors')
-    } else {
-        if(res === 0) {
-            Alert.alert(
-                "Job Already Exists",
-                "You have already set a pinger for this district",
-                [
-                    {
-                        text: "OK"
-                    }
-                ]
-            )
-        }
-        else {
-            Alert.alert(
-                "Job Added!",
-                "Job added successfully",
-                [
-                    {
-                        text: "ok",
-                    }
-                ]
-            )
-        }
-    }
-}
 
 const getDate = async () => {
     // RETURNS THE CURRENT DATE IN STRING FORMAT
@@ -111,9 +111,9 @@ const getDate = async () => {
 
 const checkSlots = async (distId = "", todayDate = "", age) => {
     const today = await getDate()
-    const fetchURL = "http://192.168.0.109:5000/" // TESTING SERVER
-    // const fetchURL = `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=${distId}&date=${today}` // PRODUCTION SERVER
-    console.log("***********Fetching at : ",fetchURL)
+    // const fetchURL = "http://192.168.0.109:5000/" // TESTING SERVER
+    const fetchURL = `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=${distId}&date=${today}` // PRODUCTION SERVER
+    // console.log("***********Fetching at : ",fetchURL)
     try {
         const lowerLimit = (age === "18") ? 18 : 45
         const upperLimit = (age === "18") ? 45 : 150 // required to check age range
@@ -166,7 +166,7 @@ const RegisterBackgroundTask = async (distId, todayDate, age) => {
     try {
         noname(distId, todayDate, age)
         await BackgroundFetch.registerTaskAsync(jobNames[jobNames.length - 1].toString(), {
-            minimumInterval: 1, // seconds,
+            minimumInterval: 30, // seconds,
       })
     } catch (err) {
         console.log("Task Register failed:", err)
@@ -178,32 +178,8 @@ const localNotif = async (data) => {
         body: data,
         title: "Slot Available!"
     }
-    Notifications.scheduleNotificationAsync({ content, trigger: null });
+    scheduleNotificationAsync({ content, trigger: null });
 }
-
-// async function sendNotif(data) {
-//     // USES AXIOS TO CALL THE EXPO PUSH NOTIFICATION API WITH THE GIVEN DATA TO GENERATE A PUSH NOTIFICATION
-//     try{
-//         const token = await AsyncStorage.getItem('pushToken')
-//         if(token !== null){
-//             try {
-//                 axios.post(api, {
-//                     to: token,
-//                     body: data,
-//                     title:"Slot Available!"
-//                 })
-//                 .then(result => console.log(result.data))
-//             } catch(e) {
-//                 console.log(e)
-//             }
-//         } else {
-//             console.log("token returned null")
-//         }
-//     } catch (e) {
-//         console.log("sendNotif error: ",e.message)
-//     }
-// }
-
 
 export const unRegister = async (distId, age, name) => {
     //UNREGISTERs A BACKGROUND TASK FROM BACKGROUNDFETCH

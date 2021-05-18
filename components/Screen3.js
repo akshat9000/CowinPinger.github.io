@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ScrollView, FlatList, TouchableHighlight, Button } from 'react-native';
+import { StyleSheet, View, FlatList, TouchableHighlight } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import BasicContainer from "./BasicContainer"
 import JobItem from "./JobItem"
+import AddInfo from "./AddInfo"
 import { useNavigation } from '@react-navigation/native';
 
 
@@ -20,45 +21,24 @@ const getAllKeys = async () => {
     }
 }
 
-// const getJobKeys = async () => {
-//     try {
-//         const jobKeys = []
-//         const keys = await getAllKeys()
-//         jobKeys = keys.filter(key => key.slice(0,3).toString() === "JOB")
-//         return jobKeys
-//     } catch (e) {
-//         console.log("Error in getJobKeys: ", e.message)
-//     }
-// }
 
-// const getList = async () => {
-//     const list2 = await getJobKeys()
-//         .then(list => {return list.map(async (key) =>{
-//                 try {
-//                     const job = {}
-//                     const jobJSON = await AsyncStorage.getItem(key)
-//                     const jobJSONTemp = JSON.parse(jobJSON)
-//                     job['state'] = jobJSONTemp['stName']
-//                     job['dist'] = jobJSONTemp['distId']
-//                     job['name'] = jobJSONTemp['distName']
-//                     return job
-//                 } catch(e) {
-//                     console.log("useEffect -> map ", e.message)
-//                 }
-//             })
-//         })
-//     return list
-// }
 
 function Screen3(props) {
     
     const [toggle, setToggle] = useState(true)
     const navigation = useNavigation()
     const [jobList, setJobList] = useState()
+    const [showInfo, setShowInfo] = useState(false)
     
-    useEffect(() => {
-        const getKeys = async () =>{
-            const keys = await getAllKeys()
+    const toggler = async () => {
+        const keys = await AsyncStorage.getAllKeys()
+        if(!keys.length){
+            setShowInfo(true)
+        }
+    }
+    const getKeys = async () =>{
+        const keys = await getAllKeys()
+            setShowInfo(false)
             const jobKeys = keys.filter(key => key.slice(0,3) === "JOB")
             // console.log(jobKeys)
             const list = []
@@ -82,13 +62,18 @@ function Screen3(props) {
                 }
             }
             console.log(list)
-        }
+    }
+
+
+    useEffect(() => {
         getKeys()
+        toggler()
     },[toggle])
     
     return (
         <View style={styles.container}>
             <BasicContainer>
+                <View>{showInfo ? (<AddInfo />) : null}</View>
                 <View style={{height: "85%"}}>
                     <FlatList 
                         data={jobList}

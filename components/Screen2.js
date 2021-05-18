@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Modal, FlatList, Button, TouchableHighlight, Alert } from 'react-native';
+import { View, StyleSheet, Modal, FlatList, Button, TouchableHighlight, Alert, Text } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import * as TaskManager from "expo-task-manager"
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { useNavigation } from '@react-navigation/native';
-// import { MaterialIcons } from '@expo/vector-icons';
 
 import BasicContainer from "./BasicContainer"
 import Card from "./Card"
 import ListItem from "./ListItem"
 import { addNewJob } from "../config/Functions"
-const axios = require('axios')
+
 
 let data1 = require('../config/States')
 let states = data1.states
@@ -20,8 +17,7 @@ let states = data1.states
 let data2 = require('../config/Districts')
 let districts = data2.districts
 
-async function registerForPushNOtifications() {
-    let token;
+const anonymous = async () => {
     if(Constants.isDevice){
         const { status : existingStatus} = await Notifications.getPermissionsAsync();
         let finalStatus = existingStatus;
@@ -33,31 +29,8 @@ async function registerForPushNOtifications() {
             Alert.alert("Permissions not granted","failed to get push token for push notifs",[{text: "ok"}])
             return;
         }
-        token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log(token);
-        // {setToken && setToken(token)}
-        // const key = "pushToken"
-        try {
-            await AsyncStorage.setItem("pushToken", token)
-        } catch (e) {
-            console.log("Error in storing token", e)
-        }
     } else {
-        alert("Must be a physical Device!")
-    }
-}
-
-async function checkToken(token) {
-    try {
-        const token = await AsyncStorage.getItem("pushToken")
-        if(token === null) {
-            console.log("token does not exists")
-            registerForPushNOtifications()
-        } else {
-            console.log(token)
-        }
-    } catch (err) {
-        console.log("checkToken ",err)
+        alert("Must be a mobile device!")
     }
 }
 
@@ -74,13 +47,14 @@ function Screen2(props) {
     });
 
     useEffect(() => {
-        TaskManager.unregisterAllTasksAsync()
-        AsyncStorage.clear()
-        checkToken()
+        // TaskManager.unregisterAllTasksAsync()
+        // AsyncStorage.clear()
+        // checkToken()
+        anonymous()
     },[])
     
     const navigation = useNavigation()
-    const [pushToken, setPushToken] = useState('');
+    // const [pushToken, setPushToken] = useState('');
     const [stateModal, setStateModal] = useState(false);
     const [distModal, setDistModal] = useState(false);
     const [chooseState, setChooseState] = useState("Select a State");
@@ -123,30 +97,60 @@ function Screen2(props) {
                             position: "absolute",
                             bottom: 20
                         }}>
-                        <TouchableHighlight
-                            activeOpacity={0.8}
-                            underlayColor="#005A9C"
-                            onPress={() => {
-                                addNewJob(chooseState,chooseDist,distId,age)
+                            <View style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "dodgerblue",
+                                width: 100,
+                                height: "110%",
+                                borderRadius: 30,
+                                marginHorizontal:10
+                            }}>
+                            <TouchableHighlight
+                                activeOpacity={0.8}
+                                underlayColor="#005A9C"
+                                onPress={() => {
+                                    addNewJob(chooseState,chooseDist,distId,age)
+                                    }}
+                                style={{
+                                    // marginHorizontal: 10
+                                    overflow: "hidden"
                                 }}
-                            style={{
-                                marginHorizontal: 20
-                            }}
-                        >
-                            <AntDesign name="plussquareo" size={40} color="dodgerblue" />        
-                        </TouchableHighlight>  
-                        <TouchableHighlight
-                            activeOpacity={0.8}
-                            underlayColor="#005A9C"
-                            onPress={() => {
-                                navigation.navigate('screen3')
+                            >
+                                <View style={{flexDirection:"row", justifyContent: "center", alignItems: "center"}}>
+                                    <Text>Add </Text>
+                                    <AntDesign name="plussquareo" size={40} color="black" />     
+                                </View>
+                                </TouchableHighlight>  
+                            </View>
+                            <View style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "dodgerblue",
+                                width: 100,
+                                height: "110%",
+                                borderRadius: 30,
+                                marginHorizontal:10
+                            }}>
+                            <TouchableHighlight
+                                activeOpacity={0.8}
+                                underlayColor="#005A9C"
+                                onPress={() => {
+                                    navigation.navigate('screen3')
+                                    }}
+                                style={{
+                                    // marginHorizontal:10,
+                                    overflow: "hidden"
                                 }}
-                            style={{
-                                marginHorizontal:20
-                            }}
-                        >
-                            <AntDesign name="checksquareo" size={40} color="dodgerblue" />   
-                        </TouchableHighlight>                         
+                            >
+                                <View style={{flexDirection:"row", justifyContent: "center", alignItems: "center"}}>
+                                    <AntDesign name="checksquareo" size={40} color="black" />   
+                                    <Text> Done</Text>
+                                </View>
+                            </TouchableHighlight>                         
+                        </View>
                     </View>   
                 </BasicContainer>
             </View>
@@ -164,7 +168,7 @@ function Screen2(props) {
                             setStateId(item.state_id)
                             // console.log(stateId)
                             setStateModal(false)
-                            // const res = districts.filter(dist => dist.state_id === item.state_id)
+                            const res = districts.filter(dist => dist.state_id === item.state_id)
                             // console.log(res[0].districts)
                             setDistList(res[0].districts)
                         }}
