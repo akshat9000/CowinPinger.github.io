@@ -113,7 +113,7 @@ const checkSlots = async (distId = "", todayDate = "", age) => {
     const today = await getDate()
     // const fetchURL = "http://192.168.0.109:5000/" // TESTING SERVER
     const fetchURL = `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=${distId}&date=${today}` // PRODUCTION SERVER
-    // console.log("***********Fetching at : ",fetchURL)
+    console.log("***********Fetching at : ",fetchURL)
     try {
         const lowerLimit = (age === "18") ? 18 : 45
         const upperLimit = (age === "18") ? 45 : 150 // required to check age range
@@ -166,7 +166,7 @@ const RegisterBackgroundTask = async (distId, todayDate, age) => {
     try {
         noname(distId, todayDate, age)
         await BackgroundFetch.registerTaskAsync(jobNames[jobNames.length - 1].toString(), {
-            minimumInterval: 30, // seconds,
+            minimumInterval: 60, // seconds,
       })
     } catch (err) {
         console.log("Task Register failed:", err)
