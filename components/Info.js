@@ -17,13 +17,16 @@ function Info() {
                         Using this App, you can set an automatic alert system for your preferred district
                     </Text>
                     <Text style={styles.text}>
-                        This app uses the open CoWin API, so the App data might vary from actual data
-                    </Text>
-                    <Text style={styles.text}>
                         The script checks the CoWin API every 1 minute
                     </Text>
                     <Text style={styles.text}>
-                        Please suggest a better name for the app, or raise any issues to the dev via twitter @AkshatS40322105, or via email - vaxslots.dev@gmail.com
+                        If the notifications are too frequent, you can always go and delete the scheduled job
+                    </Text>
+                    <Text style={styles.text2}>
+                        NOTE: This app works like a music player. If you kill the app, the notifications will stop. Just push the app into the background (i.e. switch to another app or the homescreen) and the notifications will continue
+                    </Text>
+                    <Text style={styles.text}>
+                        Please suggest a better name for the app, or raise any issues to the dev via email - vaxslots.dev@gmail.com
                     </Text>
                 </View>
             </View>
@@ -77,13 +80,26 @@ const styles = StyleSheet.create({
     },
     para:{
         margin: 0,
-        padding: 30,
-        justifyContent: "center"
+        // padding: 30,
+        paddingHorizontal: 20,
+        paddingVertical: 20,
+        justifyContent: "center",
+        // backgroundColor: "red"
     },
     text:{
-        margin: 2,
-        padding: 7,
+        // marginBottom: 2,
+        marginBottom: 2,
+        // paddingBottom: 7,
+        paddingBottom: 7,
         textAlign: "center"
+    },
+    text2:{
+        // marginBottom: 2,
+        marginBottom: 2,
+        // paddingBottom: 7,
+        paddingBottom: 7,
+        textAlign: "center",
+        fontWeight: "bold"
     }
 })
 

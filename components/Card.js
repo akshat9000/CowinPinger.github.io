@@ -35,14 +35,16 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 20,
         overflow: "hidden",
-        alignItems: "center"
+        alignItems: "center",
+        // justifyContent: "center"
     },
     pickerContainer: {
         backgroundColor: "white",
         width: "80%",
         height: "40%",
         margin: 12,
-        borderRadius: 10
+        borderRadius: 5,
+        justifyContent: "center"
     },
     stateContainer: {
         width: "100%",

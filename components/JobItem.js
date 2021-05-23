@@ -13,11 +13,11 @@ function JobItem({ state, name, age, distId, toggle, setToggle }) {
             <View style={styles.detailsContainer}>
                 <View style={styles.details}>
                     <View style={styles.state}>
-                        <Text style={{fontWeight: "bold", fontSize: 20}}>{state}</Text>
+                        <Text style={{fontWeight: "bold", fontSize: 20, paddingHorizontal: 10}} numberOfLines={1}>{state}</Text>
                     </View>
                     <View style={styles.stateDeets}>
                         <View>
-                            <Text>District - {name}</Text>
+                            <Text numberOfLines={1} style={{paddingHorizontal: 10}}>District - {name}</Text>
                         </View>
                         <View>
                             <Text>Age - {age === "45" ? "45+" : "18-45"}</Text>
@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
         width: "90%",
         height: 80,
         margin: 15,
+        marginVertical: 10,
         borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

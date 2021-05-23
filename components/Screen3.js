@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, FlatList, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, FlatList, TouchableHighlight, Text } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -73,9 +73,22 @@ function Screen3(props) {
     return (
         <View style={styles.container}>
             <BasicContainer>
-                <View>{showInfo ? (<AddInfo />) : null}</View>
-                <View style={{height: "85%"}}>
+                <View style={{
+                    backgroundColor: "dodgerblue",
+                    width: "100%",
+                    height: 70,
+                    justifyContent: "center",
+                    alignItems: "center"
+                }}>
+                    <Text style={{fontWeight: "bold", fontSize: 20}}>NOTIFICATIONS LIST</Text>
+                </View>
+                <View style={{
+                    // position: "absolute",
+                    marginTop: 20
+                }}>{showInfo ? (<AddInfo />) : null}</View>
+                <View style={{height: "75%"}}>
                     <FlatList 
+                        persistentScrollbar
                         data={jobList}
                         keyExtractor={item => item.key}
                         renderItem={({item}) => <JobItem 
@@ -88,14 +101,23 @@ function Screen3(props) {
                         />}
                     />
                 </View>
-                <TouchableHighlight
-                    underlayColor="#005A9C"
-                    activeOpacity={0.8}
-                    onPress={() => navigation.navigate('screen2')}
-                    style={{position: "absolute", bottom: 30}}
-                >
-                    <AntDesign name="plussquareo" size={40} color="dodgerblue" /> 
-                </TouchableHighlight>
+                <View style={{position: "absolute", bottom: 30, width: "20%", height: "6%",justifyContent: "center", alignItems: "center"}}>
+                    <TouchableHighlight
+                        underlayColor="#005A9C"
+                        activeOpacity={0.8}
+                        onPress={() => navigation.navigate('screen2')}
+                        style={{
+                            backgroundColor: "dodgerblue",
+                            height: "100%",
+                            width: "100%",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            borderRadius: 30
+                        }}
+                    >
+                        <AntDesign name="plussquareo" size={40} color="black" /> 
+                    </TouchableHighlight>
+                </View>
             </BasicContainer>
         </View>
     );

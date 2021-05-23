@@ -68,15 +68,19 @@ function Screen2(props) {
 
     const ageBracket = [{age: "18-45"},{age: "45+"}]
 
-
-    const onPress = (name) => {
-        console.log(name)
-    }
-
     return (
         <>
             <View style={styles.container}>
                 <BasicContainer>
+                    <View style={{
+                        backgroundColor: "dodgerblue",
+                        width: "100%",
+                        height: 70,
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}>
+                        <Text style={{fontWeight: "bold", fontSize: 20}}>SCHEDULE NOTIFICATIONS</Text>
+                    </View>
                     <Card 
                         type="STATE" 
                         setModal={setStateModal}
@@ -101,7 +105,6 @@ function Screen2(props) {
                                 flexDirection: "row",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                backgroundColor: "dodgerblue",
                                 width: 100,
                                 height: "110%",
                                 borderRadius: 30,
@@ -115,7 +118,12 @@ function Screen2(props) {
                                     }}
                                 style={{
                                     // marginHorizontal: 10
-                                    overflow: "hidden"
+                                    overflow: "hidden",
+                                    backgroundColor: "dodgerblue",
+                                    width: 100,
+                                    height: "100%",
+                                    borderRadius: 30,
+                                    justifyContent: "center"
                                 }}
                             >
                                 <View style={{flexDirection:"row", justifyContent: "center", alignItems: "center"}}>
@@ -142,7 +150,12 @@ function Screen2(props) {
                                     }}
                                 style={{
                                     // marginHorizontal:10,
-                                    overflow: "hidden"
+                                    overflow: "hidden",
+                                    backgroundColor: "dodgerblue",
+                                    width: 100,
+                                    height: "100%",
+                                    borderRadius: 30,
+                                    justifyContent: "center"
                                 }}
                             >
                                 <View style={{flexDirection:"row", justifyContent: "center", alignItems: "center"}}>
@@ -154,9 +167,10 @@ function Screen2(props) {
                     </View>   
                 </BasicContainer>
             </View>
-            <Modal visible={stateModal} animationType="slide">
+            <Modal visible={stateModal} animationType="slide" onRequestClose={() => {setStateModal(false)}}>
                 <Button 
                     title="Select a State"
+                    // onPress={() => {setStateModal(false)}}
                 />
                 <FlatList 
                     data={states}
@@ -165,6 +179,7 @@ function Screen2(props) {
                         name={item.name}
                         onPress={() => {
                             setChooseState(item.name)
+                            setChooseDist("Select a District")
                             setStateId(item.state_id)
                             // console.log(stateId)
                             setStateModal(false)
@@ -175,9 +190,10 @@ function Screen2(props) {
                     />}
                 />
             </Modal>
-            <Modal visible={distModal} animationType="slide">
+            <Modal visible={distModal} animationType="slide" onRequestClose={() => {setDistModal(false)}}>
                 <Button 
                     title="Select a District"
+                    // onPress={() => {setDistModal(false)}}
                 />
                 <FlatList 
                     data={distList}
@@ -192,9 +208,10 @@ function Screen2(props) {
                     />}
                 />
             </Modal>
-            <Modal visible={ageModal} animationType="slide">
+            <Modal visible={ageModal} animationType="slide" onRequestClose={() => {setAgeModal(false)}}>
                 <Button 
                     title="Select your age bracket"
+                    // onPress={() => {setAgeModal(false)}}
                 />
                 <FlatList 
                     data={ageBracket}

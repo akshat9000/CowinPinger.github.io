@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
         shadowRadius: 20,
         overflow: "hidden",
         alignItems: "center",
-        paddingTop: StatusBar.currentHeight
+        // paddingTop: StatusBar.currentHeight
     }
 })
 
