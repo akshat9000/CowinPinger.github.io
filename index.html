@@ -2,68 +2,145 @@
 <html>
 <head>
 	<title>Pinger</title>
+	<link rel="stylesheet" type="text/css" href="./styles.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 	<meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-	<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js" integrity="sha512-s/XK4vYVXTGeUSv4bRPOuxSDmDlTedEpMEcAQk0t/FMd9V6ft8iXdwSBxV0eD60c6w/tjotSlKu9J2AAW1ckTA==" crossorigin="anonymous"></script>
-	<style type="text/css">
-		h1 {
-			color: black;
-			font-family: arial, sans-serif;
-			font-size: 40px;
-			font-weight: bold;
-			margin-top: 0px;
-			margin-bottom: 1px;
-			padding-bottom: 10px;
-			text-decoration: underline;
-		}
-	</style>
 </head>
-<body class="container" style="background-color: rgb(224,224,224);">
-	<div style="background-color: rgb(224,224,224)" style="padding: 0;">
-		<nav class="navbar navbar-light bg-light">
-			<span style="position: relative; left: 50%; transform: translatex(-50%);">
-			  <a class="navbar-brand" href="#">
-			    <img src="./assets/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
-			    Cowin Pinger
-			  </a>
-			</span>
-		</nav>
-		<div style="background-color: white;">
-			<center>
-				<img src="./assets/logo.png" width="20%" height="20%" style="margin: 30px;">
-				<h1>Cowin Slot Pinger</h1>
-				<div>
-					<center>
-						<h3 style="color: black"><i>Scroll down to download app</i></h3>
-					</center>
+<body>
+	<section class="intro">
+		<div class="container header">
+			<div class="flex">
+				<img src="./assets/logo.png" width="20%" height="20%">
+				<h1><i><strong>Cowin Pinger</strong></i></h1>	
+				<div class="flex">
+					<p class="pee">Scroll down to download the app</p>
 				</div>
-				<div>
-					<center>
-						<p>Using this App, you can set an automatic alert system for your preferred district(s)</p>
-						<p>The script checks the CoWin API every 1 minute</p>
-						<p>If the notifications are too frequent, you can always go and delete the scheduled job</p>
-						<p><strong>NOTE: This app works like a music player. If you kill the app, the notificaitons will stop. Just push the app into the background (i.e. switch to another app or the homescreen) and the notifications will continue</strong></p>
-						<p>Please suggest a better name for the app, or raise any issue you may face, via email - vaxslots.dev@gmail.com</p>
-						<p>Click on the button below to download the apk (Currently onlly supported on android! IOS comming soon!)</p>
-					</center>
+			</div>			
+		</div>
+	</section>
+	<section class="info">
+		<div class="container">
+			<div class="data">
+			<p>
+				Using this App, ypu can set an automatic alert system for your preferred district and age bracket
+			</p>
+			<p>
+				The script checks the Cowin API every 1 minute
+			</p>
+			<p>
+				If the notifications are too frequent, you can always go and delete the scheduled notifications
+			</p>
+			<p>
+				<strong>
+					NOTE: This app works like a music player. If you kill the app, the notifications will stop. just push the app into the background (i.e switch to another app or the homescreen) and the notifications will continue.
+				</strong>
+			</p>
+			<p>
+				Please suggest a better name, or raise any issue or reccomendation to the developer via email at <i>vaxslots.dev@gmail.com</i>
+			</p>
+			<p>
+				<i>
+					Currently only available for android, IOS version coming soon!
+				</i>
+			</p>
+			<div class="form">
+				<form method="get" action="https://github.com/akshat9000/CowinPinger.github.io/releases/download/v1.0.0/Pinger.apk" class="form">
+					<button type="submit" class="btn"><i class="fab fa-android windows"></i>Download</button>
+				</form>				
+			</div>
+			</div>
+		</div>
+	</section>
+	<section>
+		<div class="container">
+			<div class="sc-container flex">
+				<h2 class="usage"><i><strong>Usage</strong></i></h2>
+				<div class="sc grid flex">
+					<div class="img-div">
+						<img src="./assets/screenshots/homePage.jpeg" class="screens">
+					</div>
+					<div class="card">
+						<p>On startup, you will be greeted with this homepage</p>
+						<p> Kindly read through the information provided for best user experience</p>
+					</div>
 				</div>
-				<div style="padding-bottom: 10px">
-					<center>
-						<form method="get" action="https://github.com/akshat9000/CowinPinger.github.io/releases/download/v1.0.0/Pinger.apk">
-						   <button type="submit" class="btn btn-primary" style="margin-bottom: 10px">Download</button>
-						</form>
-					</center>
+				<div class="divider"></div>
+				<div class="sc grid flex">
+					<div class="card">
+						<p>
+							After clicking continue, you will be directed to the <i>SCHEDULE NOTIFICATIONS</i> page
+						</p>
+						<p>
+							Here you can select your preferred state, district and age bracket for which you want notifications
+						</p>
+						<p>
+							You can set and delete multiple notification jobs
+						</p>
+					</div>
+					<div class="img-div">
+						<img src="./assets/screenshots/selectionPage.jpeg" class="screens">
+					</div>
 				</div>
-			</center>		
-			<p><i>Special thanks to <a href="https://github.com/uragirii">uragirii</a></i> for helping me debug the app</p>	
-		</div>	
-	</div>
-
-
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+				<div class="divider"></div>
+				<div class="sc grid flex">
+					<div class="img-div">
+						<img src="./assets/screenshots/selectAge.jpeg" class="screens">
+					</div>
+					<div class="card">
+						<p>
+							For example, you can select your state, district and age bracket.
+						</p>
+						<p>
+							When you're done selecting, click on the <i><strong>ADD</strong></i> button to schedule notifications
+						</p>
+						<p>
+							<i>
+								<strong>NOTE:</strong> Please do not click on <strong>DONE</strong> directly after making your selection. First click on <strong>ADD</strong>, then click on <strong>DONE</strong> to go to the <strong>NOTIFICATIONS JOB</strong> page
+							</i>
+						</p>
+					</div>
+				</div>
+				<div class="divider"></div>
+				<div class="sc grid flex">
+					<div class="card">
+						<p>
+							Once you click <i>ADD</i> you will be intimated by an alert that the job has been scheduled
+						</p>
+						<p>
+							If the job is already scheduled, (i.e. if the same selection has been previously added) you will be intimated about duplicate jobs too
+						</p>
+					</div>
+					<div class="img-div">
+						<img src="./assets/screenshots/jobAddedAlert.jpeg" class="screens">
+					</div>
+				</div>
+				<div class="divider"></div>
+				<div class="sc grid flex">
+					<div class="img-div">
+						<img src="./assets/screenshots/notificationsList.jpeg" class="screens">
+					</div>
+					<div class="card">
+						<p>
+							After clicking <i>DONE</i> on the previous page, you will be directed to the <i>NOTIFICATIONS LIST</i> page
+						</p>
+						<p>
+							Here you will be able to see a list of all your scheduled jobs
+						</p>
+						<p>
+							To delete a job, click on the <i class="fas fa-trash-alt"></i> icon button next to the job given in the list.
+						</p>
+						<p>
+							To add more jobs, you can click the <i class="far fa-plus-square"></i> icon button to go back to the <i>SCHEDULE NOTIFICATIONS</i> page
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="usage-end">
+				
+			</div>
+		</div>
+	</section>
 </body>
 </html>
